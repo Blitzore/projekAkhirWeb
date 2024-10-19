@@ -2,9 +2,14 @@
 // Menyertakan file autoload dari Composer
 require 'vendor/autoload.php';
 
-// Menggunakan namespace PHPMailer
+// Menggunakan namespace PHPMailer dan Dotenv
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Dotenv\Dotenv;
+
+// Memuat file .env
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 // Mengecek apakah form di-submit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -18,23 +23,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // Konfigurasi server SMTP
-        $mail->isSMTP();                                    // Set PHPMailer untuk menggunakan SMTP
-        $mail->Host = 'smtp.gmail.com';                     // Alamat server SMTP (untuk Gmail)
-        $mail->SMTPAuth = true;                             // Aktifkan autentikasi SMTP
-        $mail->Username = 'ahmadhabib2b@gmail.com';         // Gunakan dengan alamat Gmail kamu
-        $mail->Password = 'yyxfufwfuvaabtly';               // Gunakan dengan Sandi Aplikasi dari Google
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Aktifkan enkripsi TLS
-        $mail->Port = 587;                                  // Port SMTP untuk TLS
+        $mail->isSMTP();
+        $mail->Host = $_ENV['SMTP_HOST'];
+        $mail->SMTPAuth = true;
+        $mail->Username = $_ENV['SMTP_USERNAME'];
+        $mail->Password = $_ENV['SMTP_PASSWORD'];
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = $_ENV['SMTP_PORT'];
 
         // Penerima dan pengirim email
-        $mail->setFrom($email, $nama);  // Alamat email pengirim
-        $mail->addAddress('ahmadhabib2b@gmail.com', 'Ahmad'); // Gunakan dengan alamat email penerima
+        $mail->setFrom($_ENV['EMAIL_FROM'], $nama);  // Alamat email pengirim
+        $mail->addAddress($_ENV['EMAIL_FROM'], 'Ahmad'); // Gunakan dengan alamat email penerima
 
         // Konten email
-        $mail->isHTML(true);                                // Set email sebagai format HTML
-        $mail->Subject = 'Saran pengembangan Budgetin';          // Subjek email
-        $mail->Body    = "Nama: $nama<br>Email: $email<br>Pesan: $pesan"; // Isi email dalam format HTML
-        $mail->AltBody = "Nama: $nama\nEmail: $email\nPesan: $pesan"; // Isi email (Plain Text)
+        $mail->isHTML(true);
+        $mail->Subject = 'Saran pengembangan Budgetin';
+        $mail->Body    = "Nama: $nama<br>Email: $email<br>Pesan: $pesan";
+        $mail->AltBody = "Nama: $nama\nEmail: $email\nPesan: $pesan";
 
         // Kirim email
         $mail->send();
