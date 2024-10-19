@@ -49,15 +49,15 @@
         <div class="row">
           <img src="budgetin.png" alt="Logo budgetin" class="mx-auto" />
           <h1 class="fs-2 text-center">Control your money, live worry-free.</h1>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path
-              fill="#ffffff"
-              fill-opacity="1"
-              d="M0,192L30,165.3C60,139,120,85,180,96C240,107,300,181,360,224C420,267,480,277,540,261.3C600,245,660,203,720,202.7C780,203,840,245,900,229.3C960,213,1020,139,1080,128C1140,117,1200,171,1260,181.3C1320,192,1380,160,1410,144L1440,128L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z"
-            ></path>
-          </svg>
         </div>
       </div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+        <path
+          fill="#ffffff"
+          fill-opacity="1"
+          d="M0,192L30,165.3C60,139,120,85,180,96C240,107,300,181,360,224C420,267,480,277,540,261.3C600,245,660,203,720,202.7C780,203,840,245,900,229.3C960,213,1020,139,1080,128C1140,117,1200,171,1260,181.3C1320,192,1380,160,1410,144L1440,128L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z"
+        ></path>
+      </svg>
     </section>
     <!-- Akhir Home -->
 
@@ -91,32 +91,32 @@
     <!-- Awal Contact -->
     <section id="contact">
       <div class="container">
-        <div class="row text-center">
-          <div class="col mb-3">
-            <h2>Contact Us</h2>
+          <div class="row text-center">
+              <div class="col mb-3">
+                  <h2>Contact Us</h2>
+              </div>
           </div>
-        </div>
-        <div class="row justify-content-center">
-          <div class="col-md-6">
-            <form>
-              <div class="mb-3">
-                <label for="nama" class="form-label">Nama Lengkap</label>
-                <input type="text" class="form-control" id="nama" aria-label="default input example" placeholder="Masukkan nama" />
+          <div class="row justify-content-center">
+              <div class="col-md-6">
+                  <form id="contactForm" method="post">
+                      <div class="mb-3">
+                          <label for="nama" class="form-label">Nama Lengkap</label>
+                          <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama" required />
+                      </div>
+                      <div class="mb-3">
+                          <label for="email" class="form-label">Email</label>
+                          <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan Email" required />
+                      </div>
+                      <div class="mb-3">
+                          <label for="pesan" class="form-label">Pesan</label>
+                          <textarea class="form-control" id="pesan" name="pesan" rows="5" placeholder="Masukkan Pesan" required></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Kirim</button>
+                  </form>
+                  <div id="responseMessage" class="mt-3"></div> <!-- Tempat untuk menampilkan respons -->
               </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Masukkan Email" />
-              </div>
-              <div class="mb-3">
-                <label for="pesan" class="form-label">Pesan</label>
-                <textarea class="form-control" id="pesan" rows="5" placeholder="Masukkan Pesan"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Kirim</button>
-            </form>
           </div>
-        </div>
       </div>
-
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
         <path
           fill="#fff"
