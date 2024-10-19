@@ -18,6 +18,11 @@ $(document).ready(function () {
       $(".navbar-collapse").append(divMsAuto);
     }
   });
+
+  $(".nav-link").click(function () {
+    $(".nav-link").removeClass("active"); // Hapus class active dari semua link
+    $(this).addClass("active"); // Tambahkan class active ke link yang diklik
+  });
 });
 
 const liLogin = `
