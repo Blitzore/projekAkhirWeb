@@ -19,9 +19,32 @@ $(document).ready(function () {
     }
   });
 
+  // Membuat nav active
   $(".nav-link").click(function () {
     $(".nav-link").removeClass("active"); // Hapus class active dari semua link
     $(this).addClass("active"); // Tambahkan class active ke link yang diklik
+  });
+
+  // Ajax untuk mengirim contact form
+  $("#contactForm").on("submit", function (event) {
+    event.preventDefault(); // Mencegah pengiriman formulir secara default
+
+    // Ambil data formulir
+    var formData = $(this).serialize();
+
+    // Kirim data menggunakan AJAX
+    $.ajax({
+      type: "POST",
+      url: "sendEmail.php", // Ubah ini ke lokasi file PHP yang mengirim email
+      data: formData,
+      success: function (response) {
+        $("#responseMessage").html('<div class="alert alert-success">' + response + "</div>");
+        $("#contactForm")[0].reset(); // Reset formulir setelah berhasil
+      },
+      error: function () {
+        $("#responseMessage").html('<div class="alert alert-danger">Ada kesalahan saat mengirim email.</div>');
+      },
+    });
   });
 });
 
