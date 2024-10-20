@@ -1,0 +1,15 @@
+body {
+  background: url(../Gambar/bg.png);
+  background-size: cover;
+}
+
+.register {
+  margin-top: 10em;
+  box-shadow: 0px 4px 5px -1px rgba(0, 0, 0, 0.1), 0px -4px 5px -1px rgba(0, 0, 0, 0.1), 4px 0px 5px -1px rgba(0, 0, 0, 0.1), -4px 0px 5px -1px rgba(0, 0, 0, 0.1);
+  padding: 60px 20px;
+  border-radius: 20px;
+}
+
+.form-check {
+  font-size: 0.9em;
+}
