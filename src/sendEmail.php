@@ -1,6 +1,6 @@
 <?php
 // Menyertakan file autoload dari Composer
-require 'vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Menggunakan namespace PHPMailer dan Dotenv
 use PHPMailer\PHPMailer\PHPMailer;
@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\Exception;
 use Dotenv\Dotenv;
 
 // Memuat file .env
-$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 // Mengecek apakah form di-submit

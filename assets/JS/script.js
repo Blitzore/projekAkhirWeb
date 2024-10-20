@@ -35,7 +35,7 @@ $(document).ready(function () {
     // Kirim data menggunakan AJAX
     $.ajax({
       type: "POST",
-      url: "sendEmail.php", // Ubah ini ke lokasi file PHP yang mengirim email
+      url: "src/sendEmail.php", // Sesuaikan ini ke path yang benar
       data: formData,
       success: function (response) {
         $("#responseMessage").html('<div class="alert alert-success">' + response + "</div>");
