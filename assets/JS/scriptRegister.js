@@ -9,7 +9,7 @@ $(document).ready(function () {
   });
 
   // Ajax untuk mengembalikan ke index.html dan pengiriman form
-  $("#contactForm").on("submit", function (event) {
+  $("#registerForm").on("submit", function (event) {
     event.preventDefault(); // Mencegah pengiriman formulir secara default
 
     // Ambil data formulir

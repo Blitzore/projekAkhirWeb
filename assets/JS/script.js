@@ -63,7 +63,7 @@ const liLogin = `
     <li class="nav-item">
       <div class="mr-3 d-flex align-items-center"> 
         <i class="bi bi-person-fill fs-3 me-2"></i>
-        <a class="nav-link d-block w-100" href="#">Login</a>
+        <a class="nav-link d-block w-100" href="templates/login.html">Login</a>
       </div>
     </li>
   `;
