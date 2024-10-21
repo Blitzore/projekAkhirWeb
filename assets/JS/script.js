@@ -2,8 +2,9 @@ $(document).ready(function () {
   // Simpan elemen .ms-auto dalam variabel
   const divMsAuto = $(".ms-auto").clone();
 
-  $(window).resize(function () {
-    var windowWidth = $(window).width();
+  // Fungsi untuk memeriksa lebar jendela dan memindahkan tombol jika diperlukan
+  function checkWindowSize() {
+    let windowWidth = $(window).width();
 
     if (windowWidth < 768) {
       // Tampilan mobile
@@ -14,9 +15,19 @@ $(document).ready(function () {
       }
     } else {
       // Tampilan desktop (kembalikan tampilan)
-      $(".navbar-nav .mr-3").parent().remove();
-      $(".navbar-collapse").append(divMsAuto);
+      if ($(".navbar-nav .mr-3").length > 0) {
+        $(".navbar-nav .mr-3").parent().remove(); // Hapus login & register yang ada
+        $(".navbar-collapse").append(divMsAuto); // Tambahkan elemen .ms-auto kembali
+      }
     }
+  }
+
+  // Panggil fungsi ini ketika halaman pertama kali dibuka
+  checkWindowSize();
+
+  // Panggil fungsi ini setiap kali ukuran jendela berubah
+  $(window).resize(function () {
+    checkWindowSize();
   });
 
   // Membuat nav active
@@ -52,7 +63,7 @@ const liLogin = `
     <li class="nav-item">
       <div class="mr-3 d-flex align-items-center"> 
         <i class="bi bi-person-fill fs-3 me-2"></i>
-        <a class="nav-link" href="#">Login</a>
+        <a class="nav-link d-block w-100" href="#">Login</a>
       </div>
     </li>
   `;
@@ -60,7 +71,7 @@ const liRegister = `
     <li class="nav-item">
       <div class="mr-3 d-flex align-items-center"> 
         <i class="bi bi-clipboard-fill fs-3 me-2"></i>
-        <a class="nav-link" href="#">Register</a>
+        <a class="nav-link d-block w-100" href="templates/register.html">Register</a>
       </div>
     </li>
   `;
