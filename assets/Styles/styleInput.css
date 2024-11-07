@@ -1,0 +1,92 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  max-width: 2400px;
+  background-color: #f0f8ff;
+  /* Latar belakang yang lebih lembut */
+  font-family: "Arial", sans-serif;
+  /* Ganti font untuk tampilan yang lebih modern */
+}
+.nav::after {
+  margin-top: 5em;
+}
+img {
+  width: 11em;
+  padding: 0;
+}
+
+.wrapper {
+  position: relative;
+  background: #ffffff;
+  /* Warna latar belakang putih */
+  border: 1px solid rgba(50, 50, 50, 0.2);
+  /* Ganti warna border */
+  color: black;
+  border-radius: 10px;
+  /* Radius sudut lebih halus */
+  padding: 20px;
+  /* Tambah padding */
+  width: 100%;
+  max-width: 600px;
+  margin: 50px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Bayangan lembut */
+}
+
+.isi {
+  margin-bottom: 15px;
+  /* Tambahkan jarak antar input */
+  border: 1px solid #ccc;
+  /* Warna border input */
+  border-radius: 5px;
+  /* Radius sudut input */
+  padding: 10px;
+  /* Tambah padding dalam input */
+  width: calc(100% - 22px);
+  /* Sesuaikan lebar input */
+}
+
+button,
+input[type="submit"],
+input[type="reset"] {
+  background-color: #007bff;
+  /* Warna tombol biru */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  /* Tambah transisi */
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+  background-color: #0056b3;
+  /* Warna saat di-hover */
+  transform: translateY(-2px);
+  /* Efek elevasi saat di-hover */
+}
+
+label.menu {
+  font-weight: bold;
+  /* Membuat label lebih tegas */
+  margin-top: 10px;
+  /* Tambah jarak atas label */
+}
+
+/* Tambahan styling untuk tombol di bagian bawah */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  /* Menempatkan tombol di kiri dan kanan */
+  margin-top: 20px;
+}
+
+.button-group input {
+  margin-left: 10px;
+  /* Jarak antara tombol */
+}
