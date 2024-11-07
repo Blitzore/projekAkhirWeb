@@ -28,6 +28,28 @@ $(document).ready(function () {
     return wouldBeTotal <= totalBudget;
   }
 
+  // Fungsi untuk memeriksa apakah opsi sudah dipilih di select lain
+  function isOptionSelected(optionValue) {
+    let selected = false;
+    $("select[name='kategori']").each(function () {
+      if ($(this).val() === optionValue) {
+        selected = true;
+        return false; // keluar dari loop each
+      }
+    });
+    return selected;
+  }
+
+  // Event handler untuk perubahan pada select kategori
+  $(document).on("change", "select[name='kategori']", function () {
+    const selectedOption = $(this).val();
+
+    if (selectedOption !== "Pilih Kategori" && isOptionSelected(selectedOption)) {
+      showAlert("Kategori ini sudah dipilih. Silakan pilih kategori lain.", "warning");
+      $(this).val("Pilih Kategori");
+    }
+  });
+
   function loadBudgetData() {
     $.ajax({
       type: "GET",
@@ -41,10 +63,8 @@ $(document).ready(function () {
 
           $(".budget-display")
             .html(
-              `
-              <strong class="fw-bold fs-5">Budget Total: ${formatRupiah(totalBudget)}</strong><br>
-              <span class="text-muted">Remaining: ${formatRupiah(totalBudget - currentCategoryTotal)}</span>
-            `
+              `<strong class="fw-bold fs-5">Budget Total: ${formatRupiah(totalBudget)}</strong><br>
+               <span class="text-muted">Remaining: ${formatRupiah(totalBudget - currentCategoryTotal)}</span>`
             )
             .removeClass("d-none");
           $("#budget").parent().hide();
@@ -62,14 +82,16 @@ $(document).ready(function () {
           $("#addBudgetCategory").prop("disabled", true);
           showAlert("Silakan set budget total terlebih dahulu", "warning");
         }
-
-        loadBudgetData();
       },
       error: function () {
         showAlert("Terjadi kesalahan saat menghubungi server.", "danger");
       },
     });
   }
+
+  // Panggil fungsi untuk memuat data budget dan kategori saat halaman dimuat
+  loadBudgetData();
+  loadAllBudgetCategories();
 
   // Panggil fungsi untuk memuat data budget saat halaman dimuat
   loadBudgetData();
@@ -91,12 +113,18 @@ $(document).ready(function () {
 
   // Fungsi untuk menyimpan atau mengedit budget total
   $("#saveBudgetTotal").click(function () {
-    const budget = $("#budget").val();
+    const budget = parseFloat($("#budget").val());
     const monthYear = currentMonthYear;
 
     if ($(this).val() === "Save") {
-      if (!budget || parseFloat(budget) <= 0) {
+      if (!budget || budget <= 0) {
         showAlert("Silakan masukkan budget total yang valid.", "warning");
+        return;
+      }
+
+      const currentCategoryTotal = calculateTotalCategoryBudgets();
+      if (budget < currentCategoryTotal) {
+        showAlert(`Budget total tidak boleh kurang dari total budget kategori saat ini: ${formatRupiah(currentCategoryTotal)}.`, "danger");
         return;
       }
 
@@ -107,12 +135,13 @@ $(document).ready(function () {
         dataType: "json",
         success: function (response) {
           if (response.success) {
-            totalBudget = parseFloat(budget);
+            totalBudget = budget;
             showAlert(response.message, "success");
 
+            const remainingBudget = totalBudget - currentCategoryTotal;
             $(".budget-display").html(`
-              <strong class="fw-bold fs-5">Budget Total: ${formatRupiah(budget)}</strong><br>
-              <span class="text-muted">Remaining: ${formatRupiah(budget)} (Belum ada pengeluaran)</span>
+              <strong class="fw-bold fs-5">Budget Total: ${formatRupiah(totalBudget)}</strong><br>
+              <span class="text-muted">Remaining: ${formatRupiah(remainingBudget)}</span>
             `);
 
             $("#budget").val("");
@@ -151,12 +180,10 @@ $(document).ready(function () {
       data: { month_year: monthYear },
       dataType: "json",
       success: function (response) {
-        // Kosongkan semua container yang sudah ada sebelum memuat data baru
         $(".budget-category-container").not("#budgetCategory").remove();
 
         if (response.success && response.data.length > 0) {
           response.data.forEach((item) => {
-            // Buat atau clone container baru untuk setiap item
             const containerId = item.container_id;
             let container = $(`#${containerId}`);
 
@@ -166,9 +193,10 @@ $(document).ready(function () {
               $("#addBudgetContainer").before(container);
             }
 
-            // Isi data ke dalam container
+            // Simpan nilai asli budget dalam data elemen DOM
             container
               .find(".budget-category-display")
+              .data("amount", parseFloat(item.amount))
               .html(`<strong class="fw-bold fs-5">Kategori: ${item.category_name}<br>Budget: ${formatRupiah(item.amount)}</strong>`)
               .removeClass("d-none");
 
@@ -180,11 +208,16 @@ $(document).ready(function () {
             container.find(".saveBudgetCategory").val("Edit").removeClass("btn-success").addClass("btn-info");
             container.find(".deleteBudgetCategory").removeClass("d-none");
           });
+
+          // Hitung ulang total budget kategori setelah data dimuat
+          const currentCategoryTotal = calculateTotalCategoryBudgets();
+          $(".budget-display")
+            .find(".text-muted")
+            .text(`Remaining: ${formatRupiah(totalBudget - currentCategoryTotal)}`);
         } else {
-          // Tidak ada data ditemukan, kosongkan input dan tampilkan form
           $(".budget-category-display").addClass("d-none");
-          $("input[name='budgetKategori']").val("").parent().show(); // Kosongkan input
-          $("select[name='kategori']").prop("selectedIndex", 0).parent().show(); // Reset opsi default
+          $("input[name='budgetKategori']").val("").parent().show();
+          $("select[name='kategori']").prop("selectedIndex", 0).parent().show();
           $(".saveBudgetCategory").val("Save").removeClass("btn-info").addClass("btn-success");
           $(".deleteBudgetCategory").addClass("d-none");
         }
@@ -220,7 +253,8 @@ $(document).ready(function () {
         return;
       }
 
-      if (!validateCategoryBudget(parseFloat(budget))) {
+      const previousBudget = parseFloat(container.find(".budget-category-display").data("amount")) || 0;
+      if (!validateCategoryBudget(parseFloat(budget) - previousBudget)) {
         showAlert("Total budget kategori melebihi budget total yang tersedia!", "danger");
         return;
       }
@@ -241,6 +275,7 @@ $(document).ready(function () {
 
             container
               .find(".budget-category-display")
+              .data("amount", parseFloat(budget)) // Simpan nilai baru untuk referensi di masa depan
               .html(`<strong class="fw-bold fs-5">Kategori: ${category}<br>Budget: ${formatRupiah(budget)}</strong>`)
               .removeClass("d-none");
 
@@ -275,6 +310,8 @@ $(document).ready(function () {
     const containerId = container.attr("id");
 
     if (confirm("Apakah Anda yakin ingin menghapus kategori budget ini?")) {
+      const budget = parseFloat(container.find(".budget-category-display").data("amount")) || 0;
+
       $.ajax({
         type: "POST",
         url: "../src/deleteBudgetCategory.php",
@@ -287,15 +324,12 @@ $(document).ready(function () {
           if (response.success) {
             showAlert(response.message, "success");
 
-            // Reset container ke kondisi awal jika diperlukan
-            container.find(".budget-category-display").addClass("d-none");
-            container.find("input[name='budgetKategori']").val("").parent().show();
-            container.find("select[name='kategori']").val("Pilih Kategori").parent().show();
-            container.find(".saveBudgetCategory").val("Save").removeClass("btn-info").addClass("btn-success");
-            container.find(".deleteBudgetCategory").addClass("d-none");
-
-            // Hapus container setelah kategori dihapus
             container.remove();
+
+            const currentCategoryTotal = calculateTotalCategoryBudgets() - budget;
+            $(".budget-display")
+              .find(".text-muted")
+              .text(`Remaining: ${formatRupiah(totalBudget - currentCategoryTotal)}`);
           } else {
             showAlert(response.message, "danger");
           }
