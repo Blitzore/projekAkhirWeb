@@ -41,14 +41,25 @@ $(document).ready(function () {
   }
 
   // Event handler untuk perubahan pada select kategori
-  $(document).on("change", "select[name='kategori']", function () {
-    const selectedOption = $(this).val();
+  let selectedCategories = {}; // Struktur data untuk menyimpan kategori yang dipilih per bulan dan tahun
 
-    if (selectedOption !== "Pilih Kategori" && isOptionSelected(selectedOption)) {
-      showAlert("Kategori ini sudah dipilih. Silakan pilih kategori lain.", "warning");
-      $(this).val("Pilih Kategori");
+  function updateSelectedCategories() {
+    const categories = [];
+    $("select[name='kategori']").each(function () {
+      const selectedCategory = $(this).val();
+      if (selectedCategory !== "Pilih Kategori") {
+        categories.push(selectedCategory);
+      }
+    });
+    selectedCategories[currentMonthYear] = categories;
+  }
+
+  function isCategorySelected(category) {
+    if (!selectedCategories[currentMonthYear]) {
+      selectedCategories[currentMonthYear] = [];
     }
-  });
+    return selectedCategories[currentMonthYear].includes(category);
+  }
 
   function loadBudgetData() {
     $.ajax({
@@ -183,6 +194,8 @@ $(document).ready(function () {
         $(".budget-category-container").not("#budgetCategory").remove();
 
         if (response.success && response.data.length > 0) {
+          selectedCategories[monthYear] = []; // Reset kategori yang dipilih untuk bulan dan tahun ini
+
           response.data.forEach((item) => {
             const containerId = item.container_id;
             let container = $(`#${containerId}`);
@@ -193,7 +206,6 @@ $(document).ready(function () {
               $("#addBudgetContainer").before(container);
             }
 
-            // Simpan nilai asli budget dalam data elemen DOM
             container
               .find(".budget-category-display")
               .data("amount", parseFloat(item.amount))
@@ -202,14 +214,16 @@ $(document).ready(function () {
 
             container.find("input[name='budgetKategori']").val(item.amount);
             container.find("select[name='kategori']").val(item.category_name);
+            container.data("oldCategory", item.category_name);
 
             container.find("input[name='budgetKategori']").parent().hide();
             container.find("select[name='kategori']").parent().hide();
             container.find(".saveBudgetCategory").val("Edit").removeClass("btn-success").addClass("btn-info");
             container.find(".deleteBudgetCategory").removeClass("d-none");
+
+            selectedCategories[monthYear].push(item.category_name); // Tambahkan kategori yang dipilih
           });
 
-          // Hitung ulang total budget kategori setelah data dimuat
           const currentCategoryTotal = calculateTotalCategoryBudgets();
           $(".budget-display")
             .find(".text-muted")
@@ -228,10 +242,9 @@ $(document).ready(function () {
     });
   }
 
-  // Load data untuk container saat halaman dimuat
+  loadBudgetData();
   loadAllBudgetCategories();
 
-  // Fungsi untuk menyimpan atau mengedit budget kategori
   function handleSaveBudgetCategory(container) {
     if (totalBudget === 0) {
       showAlert("Silakan set budget total terlebih dahulu", "warning");
@@ -242,6 +255,7 @@ $(document).ready(function () {
     const monthYear = currentMonthYear;
     const category = container.find("select[name='kategori']").val();
     const containerId = container.attr("id");
+    const oldCategory = container.data("oldCategory");
 
     if (container.find(".saveBudgetCategory").val() === "Save") {
       if (category === "Pilih Kategori") {
@@ -250,6 +264,10 @@ $(document).ready(function () {
       }
       if (!budget) {
         showAlert("Silakan masukkan budget.", "warning");
+        return;
+      }
+      if (isCategorySelected(category) && category !== oldCategory) {
+        showAlert("Kategori ini sudah dipilih. Silakan pilih kategori lain.", "danger");
         return;
       }
 
@@ -275,7 +293,7 @@ $(document).ready(function () {
 
             container
               .find(".budget-category-display")
-              .data("amount", parseFloat(budget)) // Simpan nilai baru untuk referensi di masa depan
+              .data("amount", parseFloat(budget))
               .html(`<strong class="fw-bold fs-5">Kategori: ${category}<br>Budget: ${formatRupiah(budget)}</strong>`)
               .removeClass("d-none");
 
@@ -288,6 +306,12 @@ $(document).ready(function () {
             $(".budget-display")
               .find(".text-muted")
               .text(`Remaining: ${formatRupiah(totalBudget - currentCategoryTotal)}`);
+
+            if (oldCategory) {
+              selectedCategories[currentMonthYear] = selectedCategories[currentMonthYear].filter((cat) => cat !== oldCategory);
+            }
+            updateSelectedCategories();
+            container.data("oldCategory", category); // Set kategori baru sebagai kategori lama
           } else {
             showAlert(response.message, "danger");
           }
@@ -304,10 +328,10 @@ $(document).ready(function () {
     }
   }
 
-  // Fungsi untuk menghapus budget kategori
   function handleDeleteBudgetCategory(container) {
     const monthYear = currentMonthYear;
     const containerId = container.attr("id");
+    const category = container.find("select[name='kategori']").val();
 
     if (confirm("Apakah Anda yakin ingin menghapus kategori budget ini?")) {
       const budget = parseFloat(container.find(".budget-category-display").data("amount")) || 0;
@@ -325,6 +349,9 @@ $(document).ready(function () {
             showAlert(response.message, "success");
 
             container.remove();
+
+            // Hapus kategori dari daftar selectedCategories
+            selectedCategories[currentMonthYear] = selectedCategories[currentMonthYear].filter((cat) => cat !== category);
 
             const currentCategoryTotal = calculateTotalCategoryBudgets() - budget;
             $(".budget-display")
