@@ -13,6 +13,9 @@ if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
+// Nonaktifkan mode exception untuk mysqli
+mysqli_report(MYSQLI_REPORT_OFF); // Menonaktifkan laporan error dalam bentuk exception
+
 // Mengecek apakah form di-submit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Mengambil data dari formulir
@@ -28,19 +31,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hash password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Menyimpan data ke database
-    $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $hashedPassword);
+    // Menyimpan data pengguna ke database
+    $sqlUser = "INSERT INTO users (username, password) VALUES (?, ?)";
+    $stmtUser = $conn->prepare($sqlUser);
+    $stmtUser->bind_param("ss", $username, $hashedPassword);
 
-    if ($stmt->execute()) {
+    // Eksekusi statement dan periksa kesalahan
+    if ($stmtUser->execute()) {
         echo '<div class="alert alert-success">Registrasi berhasil!</div>';
+
+        // Tambahkan kategori default untuk pengguna baru
+        $sqlCategory = "
+            INSERT INTO categories (name, is_default, username)
+            SELECT name, TRUE, ? FROM categories WHERE username IS NULL AND is_default = TRUE
+        ";
+        $stmtCategory = $conn->prepare($sqlCategory);
+        $stmtCategory->bind_param("s", $username);
+        $stmtCategory->execute();
+        $stmtCategory->close(); // Tutup $stmtCategory setelah digunakan
     } else {
-        echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        // Memeriksa apakah kesalahan disebabkan oleh duplikasi username
+        if ($stmtUser->errno == 1062) { // Error code untuk duplikasi
+            echo '<div class="alert alert-danger">Username sudah digunakan, silakan pilih username lain.</div>';
+        } else {
+            echo '<div class="alert alert-danger">Error: ' . $stmtUser->error . '</div>';
+        }
     }
 
     // Tutup statement dan koneksi
-    $stmt->close();
+    $stmtUser->close(); // Tutup $stmtUser setelah digunakan
     $conn->close();
 } else {
     echo '<div class="alert alert-danger">Tidak ada data yang dikirim.</div>';

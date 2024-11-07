@@ -1,0 +1,29 @@
+body {
+  background-color: #e2edff;
+  margin-top: 5em;
+}
+
+img {
+  width: 11em;
+  padding: 0;
+}
+
+.row-border {
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding-bottom: 1em;
+}
+
+#alertBox {
+  position: fixed;
+  top: 5em; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; /* Ensure it's on top of other elements */
+  width: auto; /* Or set a specific width */
+  max-width: 90%; /* Adjust for responsiveness */
+}
+
+.hidden {
+  display: none;
+}

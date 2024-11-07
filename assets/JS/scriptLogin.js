@@ -18,9 +18,10 @@ $(document).ready(function () {
       },
       success: function (response) {
         var data = JSON.parse(response);
+        console.log(data); // Tambahkan ini untuk debugging
         if (data.status === "success") {
-          // Mengarahkan ke main.html
-          window.location.href = "main.html";
+          // Mengarahkan ke main.php
+          window.location.href = "main.php";
         } else {
           // Menampilkan pesan error
           $("#loginForm").prepend('<div class="alert alert-danger">' + data.message + "</div>");
