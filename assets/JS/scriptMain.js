@@ -11,17 +11,25 @@ $(document).ready(function () {
 
   let currentMonthYear = updateMonthYearDisplay();
 
-  // Fungsi untuk menghitung total budget kategori
+  // Fungsi perhitungan yang sudah diperbaiki untuk menghindari double counting
   function calculateTotalCategoryBudgets() {
     let total = 0;
-    $("input[name='budgetKategori']").each(function () {
-      const value = $(this).val() ? parseFloat($(this).val()) : 0;
-      total += value;
+    // Hanya hitung input yang visible atau yang memiliki display data
+    $(".category").each(function () {
+      const displayAmount = $(this).find(".budget-category-display").data("amount");
+      if (displayAmount) {
+        total += parseFloat(displayAmount);
+      } else {
+        const inputValue = $(this).find("input[name='budgetKategori']:visible").val();
+        if (inputValue) {
+          total += parseFloat(inputValue);
+        }
+      }
     });
     return total;
   }
 
-  // Fungsi untuk memvalidasi budget kategori
+  // Fungsi validasi original
   function validateCategoryBudget(newBudgetAmount) {
     const currentTotal = calculateTotalCategoryBudgets();
     const wouldBeTotal = currentTotal + parseFloat(newBudgetAmount);
@@ -99,13 +107,6 @@ $(document).ready(function () {
       },
     });
   }
-
-  // Panggil fungsi untuk memuat data budget dan kategori saat halaman dimuat
-  loadBudgetData();
-  loadAllBudgetCategories();
-
-  // Panggil fungsi untuk memuat data budget saat halaman dimuat
-  loadBudgetData();
 
   // Fungsi untuk menampilkan pesan alert
   function showAlert(message, type = "danger") {
@@ -311,7 +312,7 @@ $(document).ready(function () {
               selectedCategories[currentMonthYear] = selectedCategories[currentMonthYear].filter((cat) => cat !== oldCategory);
             }
             updateSelectedCategories();
-            container.data("oldCategory", category); // Set kategori baru sebagai kategori lama
+            container.data("oldCategory", category);
           } else {
             showAlert(response.message, "danger");
           }
